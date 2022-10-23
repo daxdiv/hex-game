@@ -1,7 +1,23 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useEffect, useState } from "react";
+import Button from "./components/common/Button";
+import Container from "./components/common/Container";
 
 const Home: NextPage = () => {
+  const [colorOptions, setColorOptions] = useState<string[]>([]);
+  const generateRandomHexColor = () => {
+    return `#${((Math.random() * 0xffffff) << 0).toString(16)}`;
+  };
+
+  useEffect(() => {
+    setColorOptions([
+      generateRandomHexColor(),
+      generateRandomHexColor(),
+      generateRandomHexColor(),
+      generateRandomHexColor(),
+    ]);
+  }, []);
   return (
     <>
       <Head>
@@ -10,7 +26,21 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div>hello, world!</div>
+      <Container>
+        <div className="grid grid-cols-2 grid-rows-2 gap-4">
+          <div
+            className="col-span-2 row-span-2 h-48 rounded-lg bg-white text-center leading-[12rem] text-black"
+            style={{
+              backgroundColor: colorOptions[Math.floor(Math.random() * 4)],
+            }}
+          >
+            color will be here
+          </div>
+          {colorOptions.map((color) => (
+            <Button key={Math.random()} backgroundColor={color} />
+          ))}
+        </div>
+      </Container>
     </>
   );
 };
