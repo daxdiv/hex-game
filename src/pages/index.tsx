@@ -1,23 +1,41 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "./components/common/Button";
 import Container from "./components/common/Container";
 
+interface IColorOption {
+  backgroundColor: string;
+  correct: boolean;
+}
+
 const Home: NextPage = () => {
-  const [colorOptions, setColorOptions] = useState<string[]>([]);
+  const [colorOptions, setColorOptions] = useState<IColorOption[]>([]);
+
+  const startGame = useCallback(() => {
+    const correctAnswer = {
+      backgroundColor: generateRandomHexColor(),
+      correct: true,
+    };
+    const incorrectAnswers = Array(3)
+      .fill({})
+      .map(() => ({
+        backgroundColor: generateRandomHexColor(),
+        correct: false,
+      }));
+
+    setColorOptions(
+      [correctAnswer, ...incorrectAnswers].sort(() => Math.random() - 0.5)
+    );
+  }, []);
   const generateRandomHexColor = () => {
-    return `#${((Math.random() * 0xffffff) << 0).toString(16)}`;
+    return `#${((Math.random() * 0xffffff) << 0).toString(16)}`.toUpperCase();
   };
 
   useEffect(() => {
-    setColorOptions([
-      generateRandomHexColor(),
-      generateRandomHexColor(),
-      generateRandomHexColor(),
-      generateRandomHexColor(),
-    ]);
-  }, []);
+    startGame();
+  }, [startGame]);
+
   return (
     <>
       <Head>
@@ -29,15 +47,28 @@ const Home: NextPage = () => {
       <Container>
         <div className="grid grid-cols-2 grid-rows-2 gap-4">
           <div
-            className="col-span-2 row-span-2 h-48 rounded-lg bg-white text-center leading-[12rem] text-black"
+            className="col-span-2 row-span-2 mb-2 h-48 rounded-lg border-2 border-white bg-white text-center leading-[12rem] text-black"
             style={{
-              backgroundColor: colorOptions[Math.floor(Math.random() * 4)],
+              backgroundColor: colorOptions.find(({ correct }) => correct)
+                ?.backgroundColor,
             }}
-          >
-            color will be here
-          </div>
+          ></div>
           {colorOptions.map((color) => (
-            <Button key={Math.random()} backgroundColor={color} />
+            <Button
+              key={`${color.backgroundColor}-${Math.random()}`}
+              backgroundColorHex={color.backgroundColor}
+              onClick={() => {
+                const correctAnswer = colorOptions.find(
+                  ({ correct }) => correct
+                );
+
+                if (correctAnswer?.backgroundColor === color.backgroundColor) {
+                  if (confirm("Correct! Click Ok to try again.")) startGame();
+                } else {
+                  alert("Wrong!");
+                }
+              }}
+            />
           ))}
         </div>
       </Container>
