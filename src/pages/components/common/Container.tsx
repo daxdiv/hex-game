@@ -6,7 +6,7 @@ interface IContainerProps {
 
 const Container = ({ children }: IContainerProps) => {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black font-bold text-white">
+    <div className="flex min-h-screen items-center justify-center bg-gray-800 font-bold text-white">
       {children}
     </div>
   );
